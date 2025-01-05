@@ -59,22 +59,77 @@ app.post("/get-two-pointer-status", async(req, res)=>{
     const {username, day} = reqData ; 
     console.log("The value of username is ", username)
     console.log("The value of day is ", day)
+    let flag = true ; 
+    let returnData = {
+        dayYesterday : "", 
+        dayBeforeYesterday : ""
+    }
 
     if( username &&  day){
 
-        const dayYesterday = day - 1  ; 
-        const dayBeforeYesterday = day - 2 ; 
+        // const dayYesterday = day - 1  ; 
+        // const dayBeforeYesterday = day - 2 ; 
 
-        let returnData = {
-            dayYesterday : "", 
-            dayBeforeYesterday : ""
-        }
+        
+
+        // if(day === 1)
+        // {
+        //     res.send(returnData)
+            
+
+        // }
+
+        // if(day === 2)
+        // {
+        //     const dayYesterdayDoc = await db.collection('reflections')
+        //     .where("name", "==", username)
+        //     .where('testDay', "==", day - 1 )
+        //     .get()
+
+        //     if(!dayYesterdayDoc.empty)
+        //     {
+        //         let value = ""
+        //         let ctr = 0 
+
+        //         dayYesterdayDoc.forEach((doc)=>{
+        //             const docData = doc.date() ; 
+        //             console.log("The doc data is ", docData.commitment)
+        //             value = docData.commitment 
+        //             ctr++ ; 
+        //         })
+
+        //         if(ctr === 1)
+        //         {
+        //             returnData.dayYesterday = value ; 
+        //             res.send(returnData)
+        //         }
+        //         else
+        //         {
+        //             console.log("The value is not set because there are multiple values ")
+        //             res.send({
+        //                 message : "There is something wrong with your code "
+        //             })
+        //         }
+
+        //     }
+        //     else
+        //     {
+        //         console.log("There is no such doc found in the database")
+        //         res.send({
+        //             message : "There is something wrong with your code"
+        //         })
+        //     }
+            
+        // }
+
+        
 
         
 
         try{
 
             console.log("I was here")
+           
 
             const dayYesterdayDoc = await db.collection('reflections')
             .where("name", "==", username)
@@ -101,11 +156,15 @@ app.post("/get-two-pointer-status", async(req, res)=>{
                 else
                 {
                     console.log("The value is not set because there are multiple values ")
+                    flag = false ; 
+                    
                 }
             }
             else
             {
                 console.log("The query you have used doesn't have a corresponding field in the database")
+                flag = false ; 
+                
             }
 
             const dayBeforeYesterdayDoc = await db.collection('reflections')
@@ -132,11 +191,14 @@ app.post("/get-two-pointer-status", async(req, res)=>{
                     else
                     {
                         console.log("The value is not set because there are multiple values ")
+                        flag = false 
+                        
                     }
                 }
                 else
                 {
                     console.log("The query you have used doesn't have a corresponding field in the database")
+                    flag = false 
                 }
 
 
@@ -145,7 +207,7 @@ app.post("/get-two-pointer-status", async(req, res)=>{
 
             
 
-            res.send(returnData)
+            
 
             
 
@@ -153,6 +215,7 @@ app.post("/get-two-pointer-status", async(req, res)=>{
         }
         catch(error){
             console.log("there is an error at backend at (post) /get-two-pointer-status ", error)
+            flag = false 
         }
 
         
@@ -166,10 +229,26 @@ app.post("/get-two-pointer-status", async(req, res)=>{
     }
     else
     {
-        res.send({
-            message : "There has been something wrong"
-        })
+        flag = false 
 
+    }
+
+    if(flag === false)
+    {
+        res.send({
+            message : "There is something wrong", 
+            results : false , 
+            data : returnData 
+        })
+    }
+    else
+    {
+        res.send({
+            message : "Everything is right", 
+            results : true,
+            data : returnData 
+           
+        })
     }
 
     
